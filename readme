@@ -1,0 +1,8 @@
+  -output string
+        path 2 output file (default "workingProxies.txt")
+  -proxies string
+        path 2 proxies file
+  -threads int
+        threads (default 500)
+  -timeout int
+        timeout in ms (default 500)
