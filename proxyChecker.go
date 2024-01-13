@@ -64,13 +64,12 @@ func CheckAndWrite(proxy string, writer *bufio.Writer, wg *sync.WaitGroup, ch ch
 		writer.Flush()
 		writeSync.Unlock()
 		working++
-		fmt.Println(" working proxy: ", proxy)
+		fmt.Println(working, " working, ", dead, " dead.")
 		if err != nil {
 			fmt.Println("Failed to write to file:", err)
 		}
 	} else {
 		dead++
-		fmt.Println(" dead proxy: ", proxy)
 	}
 	<-ch
 }
@@ -81,13 +80,13 @@ func CheckProxy(ipPort string, timeout int) bool {
 		return false
 	}
 	conn.SetReadDeadline(time.Now().Add(time.Duration(timeout) * time.Millisecond))
-	conn.Write([]byte("CONNECT 104.16.132.229:443 HTTP/1.1\r\nHost: 104.16.132.229:443\r\nConnection: Keep-Alive\r\n\r\n"))
-	reply := make([]byte, 16)
+	conn.Write([]byte("CONNECT 104.16.132.229:80 HTTP/1.1\r\nHost: 104.16.132.229:80\r\nConnection: Keep-Alive\r\n\r\n"))
+	reply := make([]byte, 15)
 	n, err := conn.Read(reply)
 	if err != nil {
 		return false
 	}
-	if len(string(reply[:n])) < 14 || string(reply[9:14]) == "200 C" {
+	if len(string(reply[:n])) == 15 && string(reply[:15]) == "HTTP/1.1 200 Co" {
 		return true
 	}
 	return false
